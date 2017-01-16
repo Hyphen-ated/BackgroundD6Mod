@@ -1,5 +1,4 @@
 import socket
-import struct
 import sys, signal
 from pynput.keyboard import Key, Listener, KeyCode
 
@@ -11,17 +10,14 @@ def signal_handler(signal, frame):
 signal.signal(signal.SIGINT, signal_handler)
 
 HOST = ''
-PORT = 9999
+PORT = 9998
 
 print 'Starting'
 
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 s.bind((HOST, PORT))
-s.listen(1)
 
 print 'Started'
-
-conn, addr = s.accept()
 
 
 input_pressed = False
@@ -33,9 +29,12 @@ def on_release(key):
         global input_pressed
         if key == KeyCode.from_char("o"):
             print "Swap Items"
-            input_pressed = True
-        elif key == Key.esc:
-            return False
+            try:
+                s.sendto('A',('127.0.0.1',9999))
+            except Exception as e:
+                print e.message
+        # elif key == Key.esc: # TODO maybe keep a way to end it but this was annoying in testing
+        #     return False
     except Exception as e:
         print "Exception"
 
@@ -43,17 +42,7 @@ listener = Listener(
         on_press=on_press,
         on_release=on_release)
 
-# TODO i dont understand how really any of this server code works
 
 listener.start()
-# listener.join()
+listener.join()
 
-
-while 1:
-    global input_pressed
-    data = conn.recv(1024)
-    tosend = "A" if input_pressed else "C"
-    conn.send(tosend)
-    input_pressed = False
-
-conn.close()

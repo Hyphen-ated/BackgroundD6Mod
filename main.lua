@@ -3,7 +3,9 @@ local BrettMod = RegisterMod("Brett", 1)
 
 local host, port = "127.0.0.1", 9999
 local socket = require("socket")
-local tcp = assert(socket.tcp())
+local udp = assert(socket.udp())
+udp:setsockname(host,port)
+udp:settimeout(0)
 local game = Game()
 local backupCharge = 6
 local backupId = 105
@@ -21,8 +23,8 @@ end
 
 function BrettMod:MainLoop()
   -- TODO this should maybe be in player init? i cant get that to work
-  tcp:connect(host, port)
-  local player = game:GetPlayer(0) 
+  -- tcp:connect(host, port)
+  local player = game:GetPlayer(0)
   local room = game:GetRoom()
   if not wasClear and room:IsClear() then
     -- TODO respect rules of various battery items
@@ -30,16 +32,12 @@ function BrettMod:MainLoop()
     backupCharge = backupCharge + 1
   end
   wasClear = room:IsClear()
-  if tcp ~= nil then
-    -- TODO learn how sockets/tcp works at all
-    tcp:send("Ok")
-    local data = tcp:receive(1)
-    if data ~= nil then
-      tcpData = data
-      -- magic response of "A" from server on input
-      if data == 'A' then
-        BrettMod:SwitchActive(player)
-      end
+  local data = udp:receive()
+  if data ~= nil then
+    tcpData = data
+    -- magic response of "A" from server on input
+    if data == 'A' then
+      BrettMod:SwitchActive(player)
     end
   end
 end
@@ -48,6 +46,7 @@ function BrettMod:PostRender()
   -- TODO say item name. the built in way of looking this up in the api is broken
   bgText = string.format("%s (%s charges)",backupId,backupCharge)
   Isaac.RenderText(bgText, 50, 35, 255, 255, 255, 255)
+  Isaac.RenderText(tcpData, 50, 45, 255, 255, 255, 255)
 end
 
 
