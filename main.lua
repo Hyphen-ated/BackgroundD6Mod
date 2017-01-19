@@ -40,7 +40,7 @@ function BrettMod:MainLoop()
     if data ~= nil then
         tcpData = data
         -- magic response of "A" from server on input
-        if data == 'A' then
+        if data == 'A' and not player:IsHoldingItem() then
             BrettMod:SwitchActive(player)
         end
     end
