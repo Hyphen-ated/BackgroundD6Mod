@@ -48,9 +48,9 @@ end
 
 function BrettMod:PostRender()
     -- TODO say item name. the built in way of looking this up in the api is broken
-    bgText = string.format("%s (%s charges)",backupId,backupCharge)
+    bgText = string.format("Extra item: %s (%s charges)",backupId,backupCharge)
     Isaac.RenderText(bgText, 50, 35, 255, 255, 255, 255)
-    Isaac.RenderText(tcpData, 50, 45, 255, 255, 255, 255)
+    -- Isaac.RenderText(tcpData, 50, 45, 255, 255, 255, 255)
 end
 
 function BrettMod:PlayerInit()

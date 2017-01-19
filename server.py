@@ -1,5 +1,7 @@
 import socket
 import sys, signal
+
+import time
 from pynput.keyboard import Key, Listener, KeyCode
 
 
@@ -21,14 +23,17 @@ print 'Started'
 
 
 input_pressed = False
-
+last_press = time.time()
 def on_press(key):
     pass
 def on_release(key):
     try:
         global input_pressed
-        if key == KeyCode.from_char("o"):
+        global last_press
+        cur_time = time.time()
+        if key == Key.f13 and cur_time - 0.2 > last_press:
             print "Swap Items"
+            last_press = cur_time
             try:
                 s.sendto('A',('127.0.0.1',9999))
             except Exception as e:
