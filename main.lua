@@ -11,11 +11,13 @@ local backupCharge = 6
 local wasClear = true
 local tcpData = "B"
 local bgText = ""
+local chargeText = ""
 
 --in this version, you just have a backup D6 ability and there is no swapping of items
 
 function BrettMod:UpdateChargeText()
-    bgText = "D6 charge: [" .. string.rep("#", backupCharge) .. string.rep(".", 6 - backupCharge) .. "]"
+    bgText =     "D6 charge: [" .. string.rep(" ", backupCharge) .. string.rep(".", 6 - backupCharge) .. "]"
+    chargeText = "            " .. string.rep("#", backupCharge)
 end
 
 function BrettMod:Roll(player)
@@ -56,7 +58,8 @@ function BrettMod:MainLoop()
 end
 
 function BrettMod:PostRender()
-    Isaac.RenderText(bgText, 50, 30, 255, 255, 255, 255)
+    Isaac.RenderText(bgText, 50, 30, 1, 1, 1, 1.3)
+    Isaac.RenderText(chargeText, 50, 30, 0.5, 1, 0.5, 1.3)
     -- Isaac.RenderText(tcpData, 50, 45, 255, 255, 255, 255)
 end
 
