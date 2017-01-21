@@ -51,7 +51,7 @@ function BrettMod:MainLoop()
     if data ~= nil then
         tcpData = data
         -- magic response of "A" from server on input
-        if data == 'A' and not player:IsHoldingItem() then
+        if data == 'A' then
             BrettMod:Roll(player)
         end
     end
