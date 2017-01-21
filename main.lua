@@ -8,20 +8,24 @@ udp:setsockname(host,port)
 udp:settimeout(0)
 local game = Game()
 local backupCharge = 6
-local backupId = 105
 local wasClear = true
 local tcpData = "B"
+local bgText = ""
 
-function BrettMod:SwitchActive(player)
-    currentActive = player:GetActiveItem()
-    currentCharge = player:GetActiveCharge()
-    if backupId ~= 0 then
-        player:AddCollectible(backupId, backupCharge, false)
-    else
-        player:RemoveCollectible(currentActive)
+--in this version, you just have a backup D6 ability and there is no swapping of items
+
+function BrettMod:UpdateChargeText()
+    bgText = "D6 charge: [" .. string.rep("#", backupCharge) .. string.rep(".", 6 - backupCharge) .. "]"
+end
+
+function BrettMod:Roll(player)
+    if backupCharge >= 6 then
+        player:UseActiveItem(105, true, true, true, false)
+        --only NPC's have a PlaySound method? how do I play a got damn sound
+        --player:PlaySound(SoundEffect.SOUND_DICE_SHARD, 1, 0, false, 1)
+        backupCharge = 0
+        BrettMod:UpdateChargeText()
     end
-    backupId = currentActive
-    backupCharge = currentCharge
 end
 
 
@@ -30,10 +34,15 @@ function BrettMod:MainLoop()
     -- tcp:connect(host, port)
     local player = game:GetPlayer(0)
     local room = game:GetRoom()
+
     if not wasClear and room:IsClear() then
-        -- TODO respect rules of various battery items
-        -- TODO dont go past max charge. built in way of looking up max charge broken
-        backupCharge = backupCharge + 1
+        local increase = 1;
+        local shape = room:GetRoomShape()
+        if shape >= RoomShape.ROOMSHAPE_2x2 and shape <= RoomShape.ROOMSHAPE_LBR then
+            increase = 2
+        end
+        backupCharge = math.min(backupCharge + increase, 6)
+        BrettMod:UpdateChargeText()
     end
     wasClear = room:IsClear()
     local data = udp:receive()
@@ -41,23 +50,21 @@ function BrettMod:MainLoop()
         tcpData = data
         -- magic response of "A" from server on input
         if data == 'A' and not player:IsHoldingItem() then
-            BrettMod:SwitchActive(player)
+            BrettMod:Roll(player)
         end
     end
 end
 
 function BrettMod:PostRender()
-    -- TODO say item name. the built in way of looking this up in the api is broken
-    bgText = string.format("Extra item: %s (%s charges)",backupId,backupCharge)
-    Isaac.RenderText(bgText, 50, 35, 255, 255, 255, 255)
+    Isaac.RenderText(bgText, 50, 30, 255, 255, 255, 255)
     -- Isaac.RenderText(tcpData, 50, 45, 255, 255, 255, 255)
 end
 
 function BrettMod:PlayerInit()
     backupCharge = 6
-    backupId = 105
     wasClear = true
     tcpData = "B"
+    BrettMod:UpdateChargeText()
 end
 
 BrettMod:AddCallback(ModCallbacks.MC_POST_UPDATE, BrettMod.MainLoop)
