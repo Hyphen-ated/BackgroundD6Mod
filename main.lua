@@ -1,5 +1,5 @@
 --StartDebug()
-local BrettMod = RegisterMod("Brett", 1)
+local BrettMod = RegisterMod("BackgroundD6Mod", 1)
 
 local host, port = "127.0.0.1", 9999
 local socket = require("socket")
