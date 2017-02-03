@@ -5,6 +5,7 @@ class KeyboardWatcher(object):
         self.pressed = False
         self.keycode = 100
         self.keyname = ""
+        self.current_callback = None
 
     def set_key(self, keycode, keyname):
         self.keycode = keycode
@@ -27,6 +28,8 @@ class KeyboardWatcher(object):
         return self.keycode, self.keyname
 
     def set_payloads(self, press, release):
+        if self.current_callback:
+            keyboard.unhook(self.current_callback)
         def on_press():
             if not self.pressed:
                 press(self.keyname)
@@ -35,4 +38,4 @@ class KeyboardWatcher(object):
             self.pressed = False
             release(self.keyname)
 
-        keyboard.hook_key(self.keycode, keydown_callback=on_press, keyup_callback=on_release)
+        self.current_callback = keyboard.hook_key(self.keycode, keydown_callback=on_press, keyup_callback=on_release)
