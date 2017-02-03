@@ -1,2 +1,6 @@
 # IDEA config files
 .idea/
+*.iml
+
+input_server_log.txt
+target/
