@@ -10,6 +10,7 @@ installName = 'BackgroundD6Server-' + version
 if os.path.isdir('target/'):
     shutil.rmtree('target/')
 installDir = 'target/' + installName + '/'
+steamDir = 'target/steam/'
 
 # Run the build script. The results are placed in ./dist/
 os.chdir("src")
@@ -27,3 +28,8 @@ shutil.copy('options_default.json', installDir + "options.json")
 shutil.copy('README.md', installDir + 'README.txt')
 shutil.copy('version.txt', installDir)
 shutil.make_archive("target/" + installName, "zip", 'target', installName + "/")
+
+os.mkdir(steamDir)
+shutil.copy('main.lua', steamDir)
+shutil.copy('metadata.xml', steamDir)
+shutil.copy('README.md', steamDir)
