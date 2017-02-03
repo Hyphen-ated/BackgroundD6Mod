@@ -2,6 +2,7 @@ from Tkinter import Tk, Label, Button
 
 from socket_messenger import SocketMessenger
 from keyboard_watcher import KeyboardWatcher
+from options import Options
 import logging
 
 our_port = 9998
@@ -11,9 +12,12 @@ isaac_port = 9999
 class InputServer(object):
     def __init__(self, logging_level=logging.INFO):
         self.log = logging.getLogger("input_server")
-        self.log.addHandler(logging.FileHandler("../input_server_log.txt", mode='w')) # This will erase our log file from previous runs
+        self.wdir_prefix = "../"
+        self.log.addHandler(logging.FileHandler(self.wdir_prefix + "input_server_log.txt", mode='w')) # This will erase our log file from previous runs
         self.log.setLevel(logging_level)
+        Options().load_options(self.wdir_prefix + "options.json")
         self.watcher = KeyboardWatcher()
+        self.watcher.set_key(Options().keycode, Options().keyname)
 
     def run(self):
         self.messenger = SocketMessenger(our_port, isaac_port, self)
@@ -31,11 +35,18 @@ class InputServer(object):
             self.label['text'] = "Key set to '" + keyname + "'"
             self.root.update()
             self.watcher.set_payloads(self.show_input, self.release_key)
+            opt = Options()
+            opt.keycode = keycode
+            opt.keyname = keyname
+            Options().save_options(self.wdir_prefix + "options.json")
 
         self.button = Button(self.root, text="Set Reroll Key", command=set_key)
         self.button.pack()
 
-        self.label = Label(self.root, text="")
+        labeltext = ""
+        if Options().keyname:
+            labeltext = "'" + Options().keyname + "' not pressed"
+        self.label = Label(self.root, text=labeltext)
         self.label.pack()
 
 
@@ -56,8 +67,6 @@ class InputServer(object):
         print(msg)
         self.log.error(msg)
 
-
-
 def main():
     try:
         server = InputServer()
@@ -65,7 +74,7 @@ def main():
     except Exception:
         import traceback
         errmsg = traceback.format_exc()
-        server.log_error(errmsg)
+        print(errmsg)
 
 if __name__ == "__main__":
     main()

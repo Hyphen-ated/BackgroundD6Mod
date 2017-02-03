@@ -11,7 +11,7 @@ if os.path.isdir('target/'):
     shutil.rmtree('target/')
 installDir = 'target/' + installName + '/'
 
-# Run the tracker build script. The results are placed in ./dist/
+# Run the build script. The results are placed in ./dist/
 os.chdir("src")
 subprocess.call("cxfreeze.py input_server.py --base-name=Win32GUI --target-dir dist ", shell=True, stdout=sys.stdout, stderr=sys.stderr)
 os.chdir("..")

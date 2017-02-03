@@ -33,6 +33,6 @@ class KeyboardWatcher(object):
                 self.pressed = True
         def on_release():
             self.pressed = False
-            release()
+            release(self.keyname)
 
         keyboard.hook_key(self.keycode, keydown_callback=on_press, keyup_callback=on_release)
