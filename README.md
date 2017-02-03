@@ -12,3 +12,5 @@ you click to select the key you want to use to trigger the D6 ability.
 
 If you play with a controller, use a program like joytokey to map the controller button
 you'd like to use onto a keyboard key.
+
+Credits: Hyphen-ated, Brett824
