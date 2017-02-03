@@ -4,6 +4,9 @@ from socket_messenger import SocketMessenger
 from keyboard_watcher import KeyboardWatcher
 import logging
 
+our_port = 9998
+isaac_port = 9999
+
 
 class InputServer(object):
     def __init__(self, logging_level=logging.INFO):
@@ -13,7 +16,7 @@ class InputServer(object):
         self.watcher = KeyboardWatcher()
 
     def run(self):
-        messenger = SocketMessenger(9999, self)
+        self.messenger = SocketMessenger(our_port, isaac_port, self)
 
         self.root = Tk()
         self.root.minsize(100, 50)
@@ -30,6 +33,7 @@ class InputServer(object):
     def show_input(self, key):
         print "yeah"
         self.label['text'] = key
+        self.messenger.send_socket_message("A")
 
     def release_key(self):
         print "hoboy"
