@@ -10,15 +10,20 @@ local game = Game()
 local backupCharge = 6
 local wasClear = true
 local tcpData = "B"
-local bgText = ""
-local chargeText = ""
+local d6Sprite = Sprite()
+d6Sprite:Load("gfx/backgroundd6.anm2", true)
+d6Sprite:Play("anim", true)
+local barBack = Sprite()
+barBack:Load("gfx/ui/ui_chargebar.anm2", true)
+barBack:Play("BarEmpty", true)
+local barMeter = Sprite()
+barMeter:Load("gfx/ui/ui_chargebar.anm2", true)
+barMeter:Play("BarFull", true)
+local barLines = Sprite()
+barLines:Load("gfx/ui/ui_chargebar.anm2", true)
+barLines:Play("BarOverlay6", true)
 
 --in this version, you just have a backup D6 ability and there is no swapping of items
-
-function BrettMod:UpdateChargeText()
-    bgText =     "D6 charge: [" .. string.rep(" ", backupCharge) .. string.rep(".", 6 - backupCharge) .. "]"
-    chargeText = "            " .. string.rep("#", backupCharge)
-end
 
 function BrettMod:Roll(player)
     if backupCharge >= 6 then
@@ -26,7 +31,6 @@ function BrettMod:Roll(player)
         --only NPC's have a PlaySound method? how do I play a got damn sound
         --player:PlaySound(SoundEffect.SOUND_DICE_SHARD, 1, 0, false, 1)
         backupCharge = 0
-        BrettMod:UpdateChargeText()
     end
 end
 
@@ -44,7 +48,6 @@ function BrettMod:MainLoop()
             increase = 2
         end
         backupCharge = math.min(backupCharge + increase, 6)
-        BrettMod:UpdateChargeText()
     end
     wasClear = room:IsClear()
     local data = udp:receive()
@@ -58,16 +61,41 @@ function BrettMod:MainLoop()
 end
 
 function BrettMod:PostRender()
-    Isaac.RenderText(bgText, 50, 30, 1, 1, 1, 1.3)
-    Isaac.RenderText(chargeText, 50, 30, 0.5, 1, 0.5, 1.3)
-    -- Isaac.RenderText(tcpData, 50, 45, 255, 255, 255, 255)
+
+    local barX = 55;
+    local barY = 50;
+    d6Sprite:Update()
+    d6Sprite:Render(Vector(40, 50), Vector(0, 0), Vector(0, 0))
+
+    barBack:Update()
+    barBack:Render(Vector(barX, barY), Vector(0, 0), Vector(0, 0))
+
+    barMeter:Update()
+    local meterClip = 26 - (backupCharge * 4)
+    barMeter:Render(Vector(barX, barY), Vector(0, meterClip), Vector(0, 0))
+
+    barLines:Update()
+    barLines:Render(Vector(barX, barY), Vector(0, 0), Vector(0, 0))
+--    local ents = Isaac:GetRoomEntities()
+--    for i=1,#ents do
+--        if i > 6 then
+--            return
+--        end
+--        local ent = ents[i]
+--        local str = "bad"
+--        local sprite = ent:GetSprite()
+--        if sprite then
+--            str = sprite:GetFilename()
+--        end
+--        str = str .. " " .. ent.Type .. " " .. ent.SubType
+--        Isaac.RenderText(str, 50, 20 + 10 * i , 1, 1, 1, 1.3)
+--    end
 end
 
 function BrettMod:PlayerInit()
     backupCharge = 6
     wasClear = true
     tcpData = "B"
-    BrettMod:UpdateChargeText()
 end
 
 BrettMod:AddCallback(ModCallbacks.MC_POST_UPDATE, BrettMod.MainLoop)
