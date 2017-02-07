@@ -1,8 +1,14 @@
 --StartDebug()
 local BrettMod = RegisterMod("BackgroundD6Mod", 1)
 
-local rerollKey = Isaac.LoadModData(BrettMod)
-if rerollKey == nil then rerollKey = "unbound" end
+local rerollKey = 84
+local rerollKeyName = "T"
+local savedKeyInfo = Isaac.LoadModData(BrettMod)
+if savedKeyInfo ~= nil and savedKeyInfo:len() > 1 then
+    rerollKey, rerollKeyName = savedKeyInfo:match("([^,]+),([^,]+)") -- split on single comma
+    Isaac.DebugString("Found saved info. It is: " ..savedKeyInfo)
+end
+
 local keySet = false
 
 local game = Game()
@@ -23,8 +29,6 @@ barMeter:Play("BarFull", true)
 local barLines = Sprite()
 barLines:Load("gfx/ui/ui_chargebar.anm2", true)
 barLines:Play("BarOverlay6", true)
-
---in this version, you just have a backup D6 ability and there is no swapping of items
 
 function BrettMod:Roll(player)
     if backupCharge >= 6 then
@@ -58,22 +62,23 @@ end
 function BrettMod:PostRender()
 
     if Isaac.GetChallenge() == keyBindChallenge then
-        if rerollKey == "unbound" then
-            Isaac.RenderText("No key bound", 100, 90, 0, 1, 0, 2)
+        if rerollKey == -1 then
+            Isaac.RenderText("Reroll key not bound", 100, 90, 0, 1, 0, 2)
         else
-            Isaac.RenderText("Current key binding (numerical code): "..rerollKey, 100, 90, 0, 1, 0, 2)
+            Isaac.RenderText("Reroll key bound to: "..rerollKeyName .. " (code: " .. rerollKey .. ")", 100, 90, 0, 1, 0, 2)
         end
 
-        -- Wait a few seconds just in case they were mashing stuff while it was loading
-        if game:GetFrameCount() > 60 then
+        -- Wait a moment just in case they were mashing stuff while it was loading
+        if game:GetFrameCount() > 5 then
             if keySet then
                 Isaac.RenderText("Key bound! Exit the challenge now.", 100, 110, 0, 1, 0, 2)
             else
                 Isaac.RenderText("Press desired key now", 100, 110, 0, 1, 0, 2)
-                for i, v in pairs(Keyboard) do
+                for k, v in pairs(Keyboard) do
                     if Input.IsButtonPressed(v, 0) then
-                        Isaac.SaveModData(BrettMod, tostring(v))
                         rerollKey = v
+                        rerollKeyName = k:sub(5)
+                        Isaac.SaveModData(BrettMod, tostring(rerollKey .. "," .. rerollKeyName))
                         keySet = true
                     end
                 end
