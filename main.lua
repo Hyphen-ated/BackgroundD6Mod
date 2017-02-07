@@ -13,7 +13,7 @@ local keySet = false
 local game = Game()
 local backupCharge = 6
 local wasClear = true
-
+local lastFrameCount = 0
 local keyBindChallenge = Isaac.GetChallengeIdByName("Change Keybind For Built-In D6");
 
 local d6Sprite = Sprite()
@@ -42,8 +42,12 @@ end
 function BuiltInD6Mod:MainLoop()
     local player = game:GetPlayer(0)
     local room = game:GetRoom()
-
-    if not wasClear and room:IsClear() then
+    local roomClear = room:IsClear()
+    local frameCount = room:GetFrameCount()
+    --check to see if the room became cleared, and we are still in the same room
+    --(there was a bug where you could bomb from a nonclear to a clear room and charge.
+    -- framecount goes to 0 when you change room, so it fixes that)
+    if not wasClear and roomClear and frameCount >= lastFrameCount then
         local increase = 1;
         local shape = room:GetRoomShape()
         if shape >= RoomShape.ROOMSHAPE_2x2 and shape <= RoomShape.ROOMSHAPE_LBR then
@@ -51,7 +55,9 @@ function BuiltInD6Mod:MainLoop()
         end
         backupCharge = math.min(backupCharge + increase, 6)
     end
-    wasClear = room:IsClear()
+    wasClear = roomClear
+    lastFrameCount = frameCount
+
     if Input.IsButtonPressed(rerollKey, 0) then
         BuiltInD6Mod:Roll(player)
     end
@@ -59,7 +65,6 @@ function BuiltInD6Mod:MainLoop()
 end
 
 function BuiltInD6Mod:PostRender()
-
     if Isaac.GetChallenge() == keyBindChallenge then
         if rerollKey == -1 then
             Isaac.RenderText("Reroll key not bound", 100, 90, 0, 1, 0, 2)
