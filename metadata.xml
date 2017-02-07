@@ -12,7 +12,7 @@ You bind a key inside this external utility, and press that key to use your D6 a
 You have to turn on the --luadebug option in order for the input server to talk to isaac:
 steam -&gt; right click isaac -&gt; properties -&gt; general -&gt; set launch options -&gt; type in --luadebug
 </description>
-    <version>0.3</version>
+    <version>0.6</version>
     <visibility>Public</visibility>
     <tag id="Lua"/>
     <tag id="Items"/>

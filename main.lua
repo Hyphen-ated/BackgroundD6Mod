@@ -5,15 +5,9 @@ local rerollKey = Isaac.LoadModData(BrettMod)
 if rerollKey == nil then rerollKey = "unbound" end
 local keySet = false
 
-local host, port = "127.0.0.1", 9999
-local socket = require("socket")
-local udp = assert(socket.udp())
-udp:setsockname(host,port)
-udp:settimeout(0)
 local game = Game()
 local backupCharge = 6
 local wasClear = true
-local tcpData = "B"
 
 local keyBindChallenge = Isaac.GetChallengeIdByName("Change Keybind For Built-In D6");
 
@@ -43,8 +37,6 @@ end
 
 
 function BrettMod:MainLoop()
-    -- TODO this should maybe be in player init? i cant get that to work
-    -- tcp:connect(host, port)
     local player = game:GetPlayer(0)
     local room = game:GetRoom()
 
@@ -61,14 +53,6 @@ function BrettMod:MainLoop()
         BrettMod:Roll(player)
     end
 
---    local data = udp:receive()
---    if data ~= nil then
---        tcpData = data
---        -- magic response of "A" from server on input
---        if data == 'A' then
---            BrettMod:Roll(player)
---        end
---    end
 end
 
 function BrettMod:PostRender()
@@ -113,26 +97,12 @@ function BrettMod:PostRender()
 
     barLines:Update()
     barLines:Render(Vector(barX, barY), Vector(0, 0), Vector(0, 0))
---    local ents = Isaac:GetRoomEntities()
---    for i=1,#ents do
---        if i > 6 then
---            return
---        end
---        local ent = ents[i]
---        local str = "bad"
---        local sprite = ent:GetSprite()
---        if sprite then
---            str = sprite:GetFilename()
---        end
---        str = str .. " " .. ent.Type .. " " .. ent.SubType
---        Isaac.RenderText(str, 50, 20 + 10 * i , 1, 1, 1, 1.3)
---    end
+
 end
 
 function BrettMod:PlayerInit()
     backupCharge = 6
     wasClear = true
-    tcpData = "B"
 end
 
 BrettMod:AddCallback(ModCallbacks.MC_POST_UPDATE, BrettMod.MainLoop)
