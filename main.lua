@@ -1,9 +1,9 @@
 --StartDebug()
-local BrettMod = RegisterMod("BackgroundD6Mod", 1)
+local BuiltInD6Mod = RegisterMod("BuiltInD6", 1)
 
 local rerollKey = 84
 local rerollKeyName = "T"
-local savedKeyInfo = Isaac.LoadModData(BrettMod)
+local savedKeyInfo = Isaac.LoadModData(BuiltInD6Mod)
 if savedKeyInfo ~= nil and savedKeyInfo:len() > 1 then
     rerollKey, rerollKeyName = savedKeyInfo:match("([^,]+),([^,]+)") -- split on single comma
     Isaac.DebugString("Found saved info. It is: " ..savedKeyInfo)
@@ -30,7 +30,7 @@ local barLines = Sprite()
 barLines:Load("gfx/ui/ui_chargebar.anm2", true)
 barLines:Play("BarOverlay6", true)
 
-function BrettMod:Roll(player)
+function BuiltInD6Mod:Roll(player)
     if backupCharge >= 6 then
         player:UseActiveItem(105, true, true, true, false)
         --only NPC's have a PlaySound method? how do I play a got damn sound
@@ -40,7 +40,7 @@ function BrettMod:Roll(player)
 end
 
 
-function BrettMod:MainLoop()
+function BuiltInD6Mod:MainLoop()
     local player = game:GetPlayer(0)
     local room = game:GetRoom()
 
@@ -54,12 +54,12 @@ function BrettMod:MainLoop()
     end
     wasClear = room:IsClear()
     if Input.IsButtonPressed(rerollKey, 0) then
-        BrettMod:Roll(player)
+        BuiltInD6Mod:Roll(player)
     end
 
 end
 
-function BrettMod:PostRender()
+function BuiltInD6Mod:PostRender()
 
     if Isaac.GetChallenge() == keyBindChallenge then
         if rerollKey == -1 then
@@ -78,7 +78,7 @@ function BrettMod:PostRender()
                     if Input.IsButtonPressed(v, 0) then
                         rerollKey = v
                         rerollKeyName = k:sub(5)
-                        Isaac.SaveModData(BrettMod, tostring(rerollKey .. "," .. rerollKeyName))
+                        Isaac.SaveModData(BuiltInD6Mod, tostring(rerollKey .. "," .. rerollKeyName))
                         keySet = true
                     end
                 end
@@ -105,11 +105,11 @@ function BrettMod:PostRender()
 
 end
 
-function BrettMod:PlayerInit()
+function BuiltInD6Mod:PlayerInit()
     backupCharge = 6
     wasClear = true
 end
 
-BrettMod:AddCallback(ModCallbacks.MC_POST_UPDATE, BrettMod.MainLoop)
-BrettMod:AddCallback(ModCallbacks.MC_POST_RENDER, BrettMod.PostRender)
-BrettMod:AddCallback(ModCallbacks.MC_POST_PLAYER_INIT, BrettMod.PlayerInit)
+BuiltInD6Mod:AddCallback(ModCallbacks.MC_POST_UPDATE, BuiltInD6Mod.MainLoop)
+BuiltInD6Mod:AddCallback(ModCallbacks.MC_POST_RENDER, BuiltInD6Mod.PostRender)
+BuiltInD6Mod:AddCallback(ModCallbacks.MC_POST_PLAYER_INIT, BuiltInD6Mod.PlayerInit)
