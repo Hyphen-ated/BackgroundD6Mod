@@ -1,5 +1,5 @@
 import shutil
-moddir = "../backgroundd6mod_855995373/"
+moddir = "../builtind6_855995373/"
 shutil.copy("main.lua", moddir)
 shutil.copy("metadata.xml", moddir)
 shutil.copy("README.md", moddir)
