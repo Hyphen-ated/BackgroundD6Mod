@@ -1,4 +1,3 @@
---StartDebug()
 local BuiltInD6Mod = RegisterMod("BuiltInD6", 1)
 
 local rerollKey = 84
@@ -6,7 +5,7 @@ local rerollKeyName = "T"
 local savedKeyInfo = Isaac.LoadModData(BuiltInD6Mod)
 if savedKeyInfo ~= nil and savedKeyInfo:len() > 1 then
     rerollKey, rerollKeyName = savedKeyInfo:match("([^,]+),([^,]+)") -- split on single comma
-    Isaac.DebugString("Found saved info. It is: " ..savedKeyInfo)
+    --Isaac.DebugString("Found saved BuiltInD6 keybind info. It is: " ..savedKeyInfo)
 end
 
 local keySet = false
@@ -88,11 +87,13 @@ function BuiltInD6Mod:PostRender()
         end
     end
 
+    --draw the d6 image
     local barX = 55;
     local barY = 50;
     d6Sprite:Update()
     d6Sprite:Render(Vector(40, 50), Vector(0, 0), Vector(0, 0))
 
+    --draw the charge bar. 3 pieces: the background, the bar itself (clipped appropriately) and the segment lines on top
     barBack:Update()
     barBack:Render(Vector(barX, barY), Vector(0, 0), Vector(0, 0))
 
