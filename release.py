@@ -1,5 +1,5 @@
-import shutil
-moddir = "../builtind6_855995373/"
+import shutil,os
+moddir = os.getenv("USERPROFILE")+"/Documents/My Games/Binding of Isaac Afterbirth+ Mods/builtind6_855995373/"
 shutil.copy("main.lua", moddir)
 shutil.copy("metadata.xml", moddir)
 shutil.copy("README.md", moddir)
